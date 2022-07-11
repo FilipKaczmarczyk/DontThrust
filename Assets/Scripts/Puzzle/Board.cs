@@ -140,6 +140,40 @@ namespace Puzzle
 
                 nullCounter = 0;
             }
+
+            StartCoroutine(FillBoard());
+        }
+
+        private IEnumerator FillBoard()
+        {
+            yield return new WaitForSeconds(0.5f);
+            
+            RefillBoard();
+            
+            yield return new WaitForSeconds(0.5f);
+            
+            matchFinder.FindAllMatches();
+
+            if (matchFinder.currentMatches.Count > 0)
+            {
+                yield return new WaitForSeconds(1.5f);
+                DestroyMatches();
+            }
+        }
+
+        private void RefillBoard()
+        {
+            for (var x = 0; x < width; x++)
+            {
+                for (var y = 0; y < height; y++)
+                {
+                    if (ActionTiles[x, y] != null) continue;
+                    
+                    var randomActionTile = Random.Range(0, actionTilesPrefabs.Length);
+                    
+                    SpawnTile(new Vector2Int(x, y), actionTilesPrefabs[randomActionTile]);
+                }
+            }
         }
     }
 }
