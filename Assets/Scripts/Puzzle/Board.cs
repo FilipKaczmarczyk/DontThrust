@@ -1,15 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace Puzzle
 {
+    public enum BoardState
+    {
+        Ready,
+        Action
+    }
+    
     public class Board : MonoBehaviour
     {
         public int width;
         public int height;
+
+        public BoardState boardState = BoardState.Ready;
 
         [SerializeField] private ActionTile[] actionTilesPrefabs;
 
@@ -29,12 +36,7 @@ namespace Puzzle
         
             SpawnTiles();
         }
-
-        private void Update()
-        {
-            matchFinder.FindAllMatches();
-        }
-
+        
         private void SpawnTiles()
         {
             for (var x = 0; x < width; x++)
@@ -62,7 +64,9 @@ namespace Puzzle
 
         private void SpawnTile(Vector2Int positionToSpawn, ActionTile actionTileToSpawn)
         {
-            var spawnedActionTile = Instantiate(actionTileToSpawn, new Vector3(positionToSpawn.x, positionToSpawn.y, 0.0f), Quaternion.identity, transform);
+            var spawnedActionTile = Instantiate(actionTileToSpawn, new Vector3(positionToSpawn.x, positionToSpawn.y + height, 0.0f), 
+                Quaternion.identity, transform);
+            
             spawnedActionTile.name = "Tile - " + positionToSpawn.x + ", " + positionToSpawn.y;
         
             ActionTiles[positionToSpawn.x, positionToSpawn.y] = spawnedActionTile;
@@ -157,8 +161,14 @@ namespace Puzzle
 
             if (matchFinder.currentMatches.Count > 0)
             {
-                yield return new WaitForSeconds(1.5f);
+                yield return new WaitForSeconds(0.5f);
                 DestroyMatches();
+            }
+            else
+            {
+                yield return new WaitForSeconds(0.5f);
+
+                boardState = BoardState.Ready;
             }
         }
 

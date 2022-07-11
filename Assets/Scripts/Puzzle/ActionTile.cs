@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Puzzle
 {
@@ -51,6 +49,9 @@ namespace Puzzle
 
         private void OnMouseDown()
         {
+            if (_board.boardState != BoardState.Ready)
+                return;
+            
             _startedTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             _isMousePressed = true;
         }
@@ -60,6 +61,10 @@ namespace Puzzle
             if (_isMousePressed && Input.GetMouseButtonUp(0))
             {
                 _isMousePressed = false;
+                
+                if (_board.boardState != BoardState.Ready)
+                    return;
+                
                 _endedTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 CalculateAngle();
             }
@@ -117,6 +122,8 @@ namespace Puzzle
 
         private IEnumerator CheckMove()
         {
+            _board.boardState = BoardState.Action;
+            
             yield return new WaitForSeconds(0.5f);
             
             _board.matchFinder.FindAllMatches();
@@ -130,6 +137,10 @@ namespace Puzzle
                     
                     _board.ActionTiles[position.x, position.y] = this;
                     _board.ActionTiles[_tileToMove.position.x, _tileToMove.position.y] = _tileToMove;
+
+                    yield return new WaitForSeconds(0.5f);
+                    
+                    _board.boardState = BoardState.Ready;
                 }
                 else
                 {
