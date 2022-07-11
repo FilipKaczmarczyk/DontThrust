@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
@@ -110,6 +111,34 @@ namespace Puzzle
                 {
                     DestroyMatchedTilesAt(matchedTile.position);
                 }
+            }
+
+            StartCoroutine(DropRow());
+        }
+
+        private IEnumerator DropRow()
+        {
+            yield return new WaitForSeconds(.2f);
+
+            var nullCounter = 0;
+
+            for (var x = 0; x < width; x++)
+            {
+                for (var y = 0; y < height; y++)
+                {
+                    if (ActionTiles[x, y] == null)
+                    {
+                        nullCounter++;
+                    }
+                    else if (nullCounter > 0)
+                    {
+                        ActionTiles[x, y].position.y -= nullCounter;
+                        ActionTiles[x, y - nullCounter] = ActionTiles[x, y];
+                        ActionTiles[x, y] = null;
+                    }
+                }
+
+                nullCounter = 0;
             }
         }
     }
