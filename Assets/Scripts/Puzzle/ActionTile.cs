@@ -18,7 +18,7 @@ namespace Puzzle
     {
         public ActionType actionType;
         
-        private Vector2Int _position;
+        public Vector2Int position;
         private Board _board;
 
         private Vector2 _startedTouchPosition;
@@ -34,18 +34,18 @@ namespace Puzzle
 
         public void SetupGem(Vector2Int position, Board board)
         {
-            _position = position;
+            this.position = position;
             _board = board;
         }
 
         private void Update()
         {
-            if (Vector2.Distance(transform.position, _position) > .01f)
-                transform.position = Vector2.Lerp(transform.position, _position, _board.actionTileSpeed * Time.deltaTime);
+            if (Vector2.Distance(transform.position, position) > .01f)
+                transform.position = Vector2.Lerp(transform.position, position, _board.actionTileSpeed * Time.deltaTime);
             else
             {
-                transform.position = new Vector3(_position.x, _position.y);
-                _board.ActionTiles[_position.x, _position.y] = this;
+                transform.position = new Vector3(position.x, position.y);
+                _board.ActionTiles[position.x, position.y] = this;
             }
         }
 
@@ -78,39 +78,39 @@ namespace Puzzle
 
         private void MoveActionTile()
         {
-            _previousPosition = _position;
+            _previousPosition = position;
             
-            if (_moveAngle is < 45f and > -45f && _position.x < _board.width - 1)
+            if (_moveAngle is < 45f and > -45f && position.x < _board.width - 1)
             {
-                _tileToMove = _board.ActionTiles[_position.x + 1, _position.y];
-                _tileToMove._position.x--;
-                _position.x++;
+                _tileToMove = _board.ActionTiles[position.x + 1, position.y];
+                _tileToMove.position.x--;
+                position.x++;
             }
-            else if (_moveAngle is < 135f and > 45f && _position.y < _board.height - 1)
+            else if (_moveAngle is < 135f and > 45f && position.y < _board.height - 1)
             {
-                _tileToMove = _board.ActionTiles[_position.x, _position.y + 1];
-                _tileToMove._position.y--;
-                _position.y++;
+                _tileToMove = _board.ActionTiles[position.x, position.y + 1];
+                _tileToMove.position.y--;
+                position.y++;
             }
-            else if (_moveAngle is < -45f and >= -135f && _position.y > 0)
+            else if (_moveAngle is < -45f and >= -135f && position.y > 0)
             {
-                _tileToMove = _board.ActionTiles[_position.x, _position.y - 1];
-                _tileToMove._position.y++;
-                _position.y--;
+                _tileToMove = _board.ActionTiles[position.x, position.y - 1];
+                _tileToMove.position.y++;
+                position.y--;
             }
-            else if (_moveAngle is < -135f or >= 135f && _position.x > 0)
+            else if (_moveAngle is < -135f or >= 135f && position.x > 0)
             {
-                _tileToMove = _board.ActionTiles[_position.x - 1, _position.y];
-                _tileToMove._position.x++;
-                _position.x--;
+                _tileToMove = _board.ActionTiles[position.x - 1, position.y];
+                _tileToMove.position.x++;
+                position.x--;
             }
             else
             {
                 return;
             }
 
-            _board.ActionTiles[_position.x, _position.y] = this;
-            _board.ActionTiles[_tileToMove._position.x, _tileToMove._position.y] = _tileToMove;
+            _board.ActionTiles[position.x, position.y] = this;
+            _board.ActionTiles[_tileToMove.position.x, _tileToMove.position.y] = _tileToMove;
 
             StartCoroutine(CheckMove());
         }
@@ -125,11 +125,15 @@ namespace Puzzle
             {
                 if (!isMatched && !_tileToMove.isMatched)
                 {
-                    _tileToMove._position = _position;
-                    _position = _previousPosition;
+                    _tileToMove.position = position;
+                    position = _previousPosition;
                     
-                    _board.ActionTiles[_position.x, _position.y] = this;
-                    _board.ActionTiles[_tileToMove._position.x, _tileToMove._position.y] = _tileToMove;
+                    _board.ActionTiles[position.x, position.y] = this;
+                    _board.ActionTiles[_tileToMove.position.x, _tileToMove.position.y] = _tileToMove;
+                }
+                else
+                {
+                    _board.DestroyMatches();
                 }
             }
         }

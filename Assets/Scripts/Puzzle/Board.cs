@@ -89,5 +89,28 @@ namespace Puzzle
 
             return false;
         }
+
+        private void DestroyMatchedTilesAt(Vector2Int position)
+        {
+            if (ActionTiles[position.x, position.y] != null)
+            {
+                if (ActionTiles[position.x, position.y].isMatched)
+                {
+                    Destroy(ActionTiles[position.x, position.y].gameObject);
+                    ActionTiles[position.x, position.y] = null;
+                }
+            }
+        }
+
+        public void DestroyMatches()
+        {
+            foreach (var matchedTile in matchFinder.currentMatches)
+            {
+                if (matchedTile != null)
+                {
+                    DestroyMatchedTilesAt(matchedTile.position);
+                }
+            }
+        }
     }
 }
