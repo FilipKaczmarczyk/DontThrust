@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
@@ -173,6 +174,31 @@ namespace Puzzle
                     
                     SpawnTile(new Vector2Int(x, y), actionTilesPrefabs[randomActionTile]);
                 }
+            }
+            
+            CheckMisplacedTiles();
+        }
+        
+        private void CheckMisplacedTiles()
+        {
+            var foundTiles = new List<ActionTile>();
+            
+            foundTiles.AddRange(FindObjectsOfType<ActionTile>());
+
+            for (var x = 0; x < width; x++)
+            {
+                for (var y = 0; y < height; y++)
+                {
+                    if (foundTiles.Contains(ActionTiles[x, y]))
+                    {
+                        foundTiles.Remove(ActionTiles[x, y]);
+                    }
+                }
+            }
+
+            foreach (var tile in foundTiles)
+            {
+                Destroy(tile.gameObject);
             }
         }
     }
